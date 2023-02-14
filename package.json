@@ -1,0 +1,16 @@
+{
+  "name": "htn-backend-ivanyu",
+  "version": "1.0.0",
+  "description": "Backend Challenge for HTN Backend Dev Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo Error: no test specified && exit 1"
+  },
+  "author": "Ivan",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.4"
+  }
+}
