@@ -38,7 +38,7 @@ db.serialize(() => {
   `,
     (err) => {
       if (err) {
-        console.log(`User table already exists. Error: ${err}`);
+        console.log(`User table already exists. ${err}`);
       } else {
         console.log("User table created.");
       }
@@ -58,7 +58,7 @@ db.serialize(() => {
   `,
     (err) => {
       if (err) {
-        console.log(`Skills table already exists. Error: ${err}`);
+        console.log(`Skills table already exists. ${err}`);
       } else {
         console.log("Skills table created.");
         populateTables();
@@ -85,7 +85,7 @@ const populateTables = () => {
 
       let userId;
       db.get(`SELECT last_insert_rowid()`, (err, row) => {
-        if (err) console.log(`Insert failed for ${user}. \nError: ${err}`);
+        if (err) console.log(`Insert failed for ${user}. ${err}`);
         userId = row["last_insert_rowid()"];
         // console.log(userId);
 
