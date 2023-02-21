@@ -1,8 +1,9 @@
 # HTN - Backend Challenge - Ivan Yu
 - [Getting Started](#getting-started)
-- [APIs](apis)
-  * [/users - GET](#users-get)
-  * [On the right](#on-the-right)
+- [APIs](#apis)
+  * [/users - GET](#users---get)
+  * [/users/:id - GET](#usersid---get)
+  * [/users/:id - PUT](#usersid---put)
 
 
 # Getting Started
@@ -15,13 +16,13 @@
 
 # APIs
 
-## /users GET
+## /users - GET
 Lists all the users
 
 
-| Parameter    	|Type  | Description                         	| Required? |
-|--------------	|-     |------------------------------------	   | ----------|
-| offset         	|int   | Offset the results by this amount 	   | Optional  |
+| Parameter    	  |Type  | Description                         	| Required? |
+|--------------	  |-     |------------------------------------	 | ----------|
+| offset         	|int   | Offset the results by this amount 	  | Optional  |
 | limit          	|int   | Limits the number of users returned 	| Optional  |
 
 
@@ -32,7 +33,7 @@ Example:
 http://localhost:8000/users
 ```
 
-## /users/:id GET
+## /users/:id - GET
 Gets a user by user ID
 
 | Parameter    	|
@@ -44,14 +45,14 @@ Example:
 GET http://localhost:8000/users/2
 ```
 
-## /users/:id PUT
+## /users/:id - PUT
 
 Finds a user by their user ID and updates their information.
 
 For skills, if the skill does not exist, the skill will be added to the user's information.
 
 | Parameter    	|Type       | Description                       	| Required? |
-|--------------	|------     |------------------------------------	| ----------|
+|--------------	|------      |------------------------------------	| ----------|
 | name           	|string     | The user's name                      | Optional  |
 | company        	|string     | The user's company                   | Optional  |
 | email          	|string     | The user's email                     | Optional  |
