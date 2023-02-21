@@ -1,17 +1,16 @@
 # HTN - Backend Challenge - Ivan Yu
 - [About](#about)
 - [Getting Started](#getting-started)
-- [Hackers](#apis)
-  * [The Hacker Object](#the-hacker-object)
+- [Hacker](#hacker)
   * [/users - GET](#users---get)
   * [/users/:id - GET](#usersid---get)
   * [/users/:id - PUT](#usersid---put)
   * [/users/:id - DELETE](#usersid---delete)
+
+
+- [Skill](#skill)
   * [/skills/:skill - GET](#skillsskill---get)
   * max freq skills
-
-- [Skills](#skills)
-  * [The Skills Object](#the-skills-object)
 - [Test](#tests)
 - [Next Steps](#next-steps)
 
@@ -28,41 +27,30 @@ This
 3. To start the server locally
    > `npm start`
 
-# Hackers
+# Hacker
 A Hacker is a participant for Hack the North
 
-## The Hacker Object
 Attributes
 
-**id** - int
+`id` - int
 
-Unique identifier for the object
+`name` - string
 
-**name** - string
+`company` - string
 
-**company** - string
+`email` - string
 
-**email** - string
+`phone` - string
 
-**phone** - string
-
-**skills** - Skill[]
+`skills` - [Skill[ ]](#the-skill-object)
 ```
 {
+    "id": 
     "name": "Breanna Dillon",
     "company": "Jackson Ltd",
     "email": "lorettabrown@example.net",
     "phone": "+1-924-116-7963",
-    "skills": [
-        {
-            "skill": "Swift",
-            "rating": 4
-        },
-        {
-            "skill": "OpenCV",
-            "rating": 1
-        }
-    ]
+    "skills": []
 }
 ```
 
@@ -130,8 +118,22 @@ Example:
 DELETE http://localhost:8000/users/2
 ```
 
-## The Skills Object
-A Skill represent a skill that a hacker has. 
+# Skill
+A skil is a technology or attribute that a hacker has, rated from 1 - 5.
+
+`id` - int
+
+`skill` - string
+
+`rating` - int (1 to 5, inclusive)
+```
+{
+    "id": 1,
+    "skill": "Swift",
+    "rating": 4
+}
+```
+
 
 ## /skills/:skill - GET
 
