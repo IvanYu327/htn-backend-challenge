@@ -11,8 +11,7 @@
 - [Skill](#skill)
   * [/skills/:skill - GET](#skillsskill---get)
   * max freq skills
-- [Test](#tests)
-- [Next Steps](#next-steps)
+- [Tests](#tests)
 
 
 # About
