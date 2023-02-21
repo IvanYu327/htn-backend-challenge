@@ -36,15 +36,28 @@ A User represents someone that is attending Hack the North
 
 `id` - int
 
+The unique identifier for the object.
+
 `name` - string
+
+The user's name
 
 `company` - string
 
+The user's company
+
 `email` - string
+
+The user's email
 
 `phone` - string
 
+The user's phone number
+
 `skills` - [Skill[ ]](#skill)
+
+The skills that this user has
+
 ```
 {
     "id": 
@@ -138,9 +151,16 @@ A skill is a technology or attribute that a user has, rated from 1 - 5.
 
 `id` - int
 
+The unique identifier for the object.
+
 `skill` - string
 
+The name of the skill.
+
 `rating` - int (1 to 5, inclusive)
+
+The rating of proficiency in the skill.
+
 ```
 {
     "id": 1,
