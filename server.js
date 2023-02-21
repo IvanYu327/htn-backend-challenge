@@ -1,12 +1,13 @@
 import express from "express";
 import db from "./database.js";
+import validator from "validator";
+import _ from "lodash";
 
 const app = express();
 const PORT = 8000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(routes)
 
 //All Users Endpoint
 app.get("/users", (req, res, next) => {
@@ -25,8 +26,7 @@ app.get("/users", (req, res, next) => {
         res.status(400).json({ error: err.message });
         return;
       }
-      res.json({
-        status: 200,
+      res.status(200).json({
         message: "success",
         data: rows,
       });
@@ -37,42 +37,39 @@ app.get("/users", (req, res, next) => {
 
 //User Information Endpoint
 app.get("/users/:userID", (req, res, next) => {
-  const userID = parseInt(req.params.userID);
+  let userID = req.params.userID;
+  console.log(`GET - /users/${userID}"`);
 
-  if (!userID) {
-    res.json({
-      status: 400,
-      message: "Invalid user ID",
-    });
+  //Input Validation
+  if (!validator.isInt(userID)) {
+    console.log("\tInvalid Input");
+    res
+      .status(400)
+      .json({ message: "Invalid user ID format, user IDs are integers" });
     return;
   }
-  //TODO VERIFY ID
 
-  db.serialize(() => {
-    const userSql = `
+  userID = parseInt(userID);
+
+  const userSql = `
       SELECT *
       FROM user
-      WHERE user_id = ?`;
+      WHERE user_id = ? `;
 
-    const params = [userID];
-    let out;
+  const params = [userID];
 
-    db.get(userSql, params, (err, row) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
+  db.get(userSql, params, (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
 
-      if (row) out = row;
-      else {
-        res.json({
-          status: 400,
-          message: "No user found",
-          data: out,
-        });
-        return;
-      }
-    });
+    if (!row) {
+      res.status(200).json({ message: "No user found" });
+      return;
+    }
+
+    let out = row;
 
     const skillSql = `
       SELECT skill, rating
@@ -81,31 +78,56 @@ app.get("/users/:userID", (req, res, next) => {
 
     db.all(skillSql, params, (err, rows) => {
       if (err) {
-        res.status(400).json({ error: err.message });
+        res.status(500).json({ error: err.message });
         return;
       }
 
       out.skills = rows;
 
-      res.json({
-        status: 200,
+      res.status(200).json({
         message: "success",
         data: out,
       });
+      return;
     });
   });
 });
 
 //Updating User Data Endpoint
-app.patch("/users/:userID", (req, res, next) => {
-  const updateData = {
-    name: req.body.name,
-    company: req.body.password,
-    email: req.body.email,
-    phone: req.body.phone,
-  };
+app.put("/users/:userID", (req, res, next) => {
+  //Input Validation
+  //TODO: Validate that no other key value pairs are there
+  updatedName = req.body.name;
+  updatedCompany = req.body.company;
+  updatedEmail = req.body.email;
+  updatedPhone = req.body.phone;
+  updatedSkills = req.body.skills;
+
+  if (!_.isString(updatedName)) {
+    res.status(400).json({ message: "Names must be a string." });
+    return;
+  }
+
+  if (!_.isString(updatedCompany)) {
+    res.status(400).json({ message: "Company must be a string." });
+    return;
+  }
+
+  if (!validator.isEmail(email)) {
+    res.status(400).json({ message: "Invalid email." });
+    return;
+  }
+
+  //TODO: CAN WE VALIDATE THIS MORE?
+  if (!_.isString(updatedPhone)) {
+    res.status(400).json({ message: "Phone number must be a string." });
+    return;
+  }
+
+  //TODO: VALIDATE SKILLS
+  //TODO: UPDATE SKILLS
+
   const userID = parseInt(req.params.userID);
-  //TO DO VALIDATE INPUTS
 
   const sql = `
     UPDATE user 
@@ -117,20 +139,19 @@ app.patch("/users/:userID", (req, res, next) => {
     WHERE user_id = ?`;
 
   const params = [
-    updateData.name,
-    updateData.company,
-    updateData.email,
-    updateData.phone,
+    updatedName,
+    updatedCompany,
+    updatedEmail,
+    updatedPhone,
     userID,
   ];
 
-  console.log(params);
   db.run(sql, params, (err, result) => {
     if (err) {
       res.status(400).json({ error: res.message });
       return;
     }
-    res.json({
+    res.status(200).json({
       message: "success",
       result: result,
     });
@@ -138,9 +159,20 @@ app.patch("/users/:userID", (req, res, next) => {
 });
 
 //Delete user endpoint
-app.delete("/api/user/:id", (req, res, next) => {
-  const userID = parseInt(req.params.userID);
-  //TO DO VALIDATE INPUTS
+app.delete("/user/:id", (req, res, next) => {
+  let userID = req.params.userID;
+  console.log(`DELETE - /users/"${userID}"`);
+
+  //Input Validation
+  if (!validator.isInt(userID)) {
+    console.log("\tInvalid Input");
+    res
+      .status(400)
+      .json({ message: "Invalid user ID format, user IDs are integers" });
+    return;
+  }
+
+  userID = parseInt(userID);
 
   db.run("DELETE FROM user WHERE id = ?", userID, function (err, result) {
     if (err) {
@@ -152,26 +184,49 @@ app.delete("/api/user/:id", (req, res, next) => {
 });
 
 //Skills Endpoints
-// These endpoint should show a list of skills and aggregate info about them.
-// Note that in the context of your hackathon, users do not gain/lose skills
-// very often.
+app.get("/skills/:skill", (req, res, next) => {
+  let skillQuery = req.params.skill;
+  console.log(`GET - /skills/${skillQuery}"`);
 
-// Try to implement the following (in SQL or with an ORM):
+  if (!_.isString(skillQuery)) {
+    res.status(400).json({ message: "Skill names must be a string." });
+    return;
+  }
 
-// Number of users with each skill (frequency)
+  skillQuery = skillQuery.toLowerCase();
+
+  //TO DO VALIDATE INPUTS
+
+  db.serialize(() => {
+    const sql = `
+      SELECT COUNT(*)
+      FROM skill
+      WHERE LOWER(skill) = ?`;
+
+    db.get(sql, [skillQuery], (err, count) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.status(200).json({
+        message: "success",
+        count: count["COUNT(*)"],
+      });
+      // TODO: POPULATE WITH SKILLS
+    });
+  });
+});
+
 // Query parameter filtering - minimum/maximum frequency
 
 // Insert here other API endpoints
 
 // Root endpoint
 app.use("/", (req, res, next) => {
-  res.json({ message: "Ok" });
-});
-
-// Default response for any other request
-app.use(function (req, res) {
-  res.status(404);
+  res.status(200).json({ message: "Ok" });
 });
 
 // Start server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`Server running on http://localhost:${PORT}/`)
+);

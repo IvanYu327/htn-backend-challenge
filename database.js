@@ -6,7 +6,7 @@ const DATABASE_SOURCE = "db.sqlite";
 
 const db = new sqlite3.Database(DATABASE_SOURCE, (err) => {
   if (err) {
-    console.error(`Error in initizlizing database. Error: ${err}`);
+    console.error(`Error in initializing database. ${err}`);
     throw err;
   }
 });
@@ -38,7 +38,7 @@ db.serialize(() => {
   `,
     (err) => {
       if (err) {
-        console.log(`User table already exists. ${err}`);
+        console.log(err.message);
       } else {
         console.log("User table created.");
       }
@@ -58,7 +58,7 @@ db.serialize(() => {
   `,
     (err) => {
       if (err) {
-        console.log(`Skills table already exists. ${err}`);
+        console.log(err.message);
       } else {
         console.log("Skills table created.");
         populateTables();
