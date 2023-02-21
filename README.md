@@ -23,11 +23,11 @@ This is a API for Hack the North's Backend Challenge.
 ```
 npm install
 ```
-3. To start the server locally
+3. Start the server
 ```
 npm start
 ```
-4. The server will run from `http://localhost:8000`
+4. The server will run locally from `http://localhost:8000`
 
 # User
 A User represents someone that is attending Hack the North
