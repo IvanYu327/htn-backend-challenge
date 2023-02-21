@@ -16,7 +16,7 @@
 
 # About
 
-This 
+This is a API for Hack the North's Backend Challenge.
 
 # Getting Started
 
@@ -41,7 +41,7 @@ Attributes
 
 `phone` - string
 
-`skills` - [Skill[ ]](#the-skill-object)
+`skills` - [Skill[ ]](#skill)
 ```
 {
     "id": 
