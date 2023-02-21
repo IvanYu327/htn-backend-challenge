@@ -1,10 +1,24 @@
 # HTN - Backend Challenge - Ivan Yu
+- [About](#about)
 - [Getting Started](#getting-started)
-- [APIs](#apis)
+- [Hackers](#apis)
+  * [The Hacker Object](#the-hacker-object)
   * [/users - GET](#users---get)
   * [/users/:id - GET](#usersid---get)
   * [/users/:id - PUT](#usersid---put)
+  * [/users/:id - DELETE](#usersid---delete)
+  * [/skills/:skill - GET](#skillsskill---get)
+  * max freq skills
 
+- [Skills](#skills)
+  * [The Skills Object](#the-skills-object)
+- [Test](#tests)
+- [Next Steps](#next-steps)
+
+
+# About
+
+This 
 
 # Getting Started
 
@@ -14,7 +28,43 @@
 3. To start the server locally
    > `npm start`
 
-# APIs
+# Hackers
+A Hacker is a participant for Hack the North
+
+## The Hacker Object
+Attributes
+
+**id** - int
+
+Unique identifier for the object
+
+**name** - string
+
+**company** - string
+
+**email** - string
+
+**phone** - string
+
+**skills** - Skill[]
+```
+{
+    "name": "Breanna Dillon",
+    "company": "Jackson Ltd",
+    "email": "lorettabrown@example.net",
+    "phone": "+1-924-116-7963",
+    "skills": [
+        {
+            "skill": "Swift",
+            "rating": 4
+        },
+        {
+            "skill": "OpenCV",
+            "rating": 1
+        }
+    ]
+}
+```
 
 ## /users - GET
 Lists all the users
@@ -57,7 +107,10 @@ For skills, if the skill does not exist, the skill will be added to the user's i
 | company        	|string     | The user's company                   | Optional  |
 | email          	|string     | The user's email                     | Optional  |
 | phone          	|string     | The user's phone                     | Optional  |
-| skill           |Skill[]    | The user's skills                    | Optional  |
+| skill           |Object[]   | The user's skills                    | Optional  |
+| skill.name      |string     | Name of the skill                    | Required  |
+| skill.rating    |int        | The skill's rating, from 1-5         | Optional  |
+
 
 
 Example: 
@@ -65,17 +118,35 @@ Example:
 PUT http://localhost:8000/users/2
 ```
 
-body: blak basdfjasdiof
+## users/:id - DELETE
+Deletes a user by their user ID
 
-## Delete user by id
+| Parameter    	|
+|--------------	|
+| No parameters |
 
-Example: `DELETE http://localhost:8000/users/2`
+Example:
+```
+DELETE http://localhost:8000/users/2
+```
 
-## Count occurences of a skill
+## The Skills Object
+A Skill represent a skill that a hacker has. 
 
-Example: `GET http://localhost:8000/skills/?skill=php`
+## /skills/:skill - GET
 
-## Get skills within range of occurences
+Returns the number of users with this skill
+
+| Parameter    	|
+|--------------	|
+| No parameters |
+
+Example: 
+```
+GET http://localhost:8000/skills/?skill=php
+```
+
+## skills/:min_frequency&max_frequency - GET
 
 Example: `GET http://localhost:8000/skills/?min_frequency=5&max_frequency=10`
 
@@ -83,75 +154,4 @@ Example: `GET http://localhost:8000/skills/?min_frequency=5&max_frequency=10`
 
 # Next Steps
 
-# Tests
 
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
-# Tests
-
-# Next Steps
