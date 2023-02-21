@@ -68,7 +68,7 @@ Limits the number of users returned
 
 > This call will return a maximum of 250 users
 
-Example:
+###### Example:
 ```
 http://localhost:8000/users
 ```
@@ -79,7 +79,7 @@ Gets a user by user ID
 ### Parameters
 No parameters
 
-Example: 
+###### Example: 
 ```
 GET http://localhost:8000/users/2
 ```
@@ -112,7 +112,7 @@ The user's updated phone number.
 The user's updated or new skills.
 
 
-Example: 
+###### Example: 
 ```
 PUT http://localhost:8000/users/2
 ```
@@ -123,7 +123,7 @@ Deletes a user by their user ID
 ### Parameters
 No parameters
 
-Example:
+###### Example:
 ```
 DELETE http://localhost:8000/users/2
 ```
@@ -154,14 +154,17 @@ Returns the number of users with this skill
 ### Parameters
 No parameters
 
-Example: 
+###### Example: 
 ```
 GET http://localhost:8000/skills/?skill=php
 ```
 
 ## skills/:min_frequency&max_frequency - GET
 
-Example: `GET http://localhost:8000/skills/?min_frequency=5&max_frequency=10`
+###### Example: 
+```
+GET http://localhost:8000/skills/?min_frequency=5&max_frequency=10
+```
 
 # Tests
 
