@@ -88,7 +88,7 @@ GET http://localhost:8000/users/2
 
 Finds a user by their user ID and updates their information.
 
-For skills, if the skill does not exist, the skill will be added to the user's information.
+For skills, if the skill does not exist, the skill will be created as a new skill and added to the user's information.
 
 ### Parameters
 `name` <sub>optional string</sub>
