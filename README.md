@@ -27,6 +27,7 @@ npm install
 ```
 npm start
 ```
+4. The server will run from `http://localhost:8000`
 
 # User
 A User represents someone that is attending Hack the North
