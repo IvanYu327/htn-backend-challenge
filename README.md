@@ -1,7 +1,7 @@
 # HTN - Backend Challenge - Ivan Yu
 - [About](#about)
 - [Getting Started](#getting-started)
-- [Hacker](#hacker)
+- [User](#user)
   * [/users - GET](#users---get)
   * [/users/:id - GET](#usersid---get)
   * [/users/:id - PUT](#usersid---put)
@@ -26,10 +26,10 @@ This is a API for Hack the North's Backend Challenge.
 3. To start the server locally
    > `npm start`
 
-# Hacker
-A Hacker is a participant for Hack the North
+# User
+A User represents someone that is attending Hack the North
 
-Attributes
+### Attributes
 
 `id` - int
 
@@ -56,11 +56,14 @@ Attributes
 ## /users - GET
 Lists all the users
 
+### Parameters
+`offset` <sub>optional int</sub>
 
-| Parameter    	  |Type  | Description                         	| Required? |
-|--------------	  |-     |------------------------------------	 | ----------|
-| offset         	|int   | Offset the results by this amount 	  | Optional  |
-| limit          	|int   | Limits the number of users returned 	| Optional  |
+Offset the results by this amount
+
+`limit` <sub>optional int</sub>
+
+Limits the number of users returned
 
 
 > This call will return a maximum of 250 users
@@ -73,9 +76,8 @@ http://localhost:8000/users
 ## /users/:id - GET
 Gets a user by user ID
 
-| Parameter    	|
-|--------------	|
-| No parameters   |
+### Parameters
+No parameters
 
 Example: 
 ```
@@ -88,16 +90,26 @@ Finds a user by their user ID and updates their information.
 
 For skills, if the skill does not exist, the skill will be added to the user's information.
 
-| Parameter    	|Type       | Description                       	| Required? |
-|--------------	|------      |------------------------------------	| ----------|
-| name           	|string     | The user's name                      | Optional  |
-| company        	|string     | The user's company                   | Optional  |
-| email          	|string     | The user's email                     | Optional  |
-| phone          	|string     | The user's phone                     | Optional  |
-| skill           |Object[]   | The user's skills                    | Optional  |
-| skill.name      |string     | Name of the skill                    | Required  |
-| skill.rating    |int        | The skill's rating, from 1-5         | Optional  |
+### Parameters
+`name` <sub>optional string</sub>
 
+The user's updated name.
+
+`company` <sub>optional string</sub>
+
+The user's updated company name.
+
+`email` <sub>optional string</sub>
+
+The user's updated email affress.
+
+`phone` <sub>optional string</sub>
+
+The user's updated phone number.
+
+`skills` <sub>optional Skill[]</sub>
+
+The user's updated or new skills.
 
 
 Example: 
@@ -108,9 +120,8 @@ PUT http://localhost:8000/users/2
 ## users/:id - DELETE
 Deletes a user by their user ID
 
-| Parameter    	|
-|--------------	|
-| No parameters |
+### Parameters
+No parameters
 
 Example:
 ```
@@ -118,7 +129,9 @@ DELETE http://localhost:8000/users/2
 ```
 
 # Skill
-A skil is a technology or attribute that a hacker has, rated from 1 - 5.
+A skil is a technology or attribute that a user has, rated from 1 - 5.
+
+### Attributes
 
 `id` - int
 
@@ -138,9 +151,8 @@ A skil is a technology or attribute that a hacker has, rated from 1 - 5.
 
 Returns the number of users with this skill
 
-| Parameter    	|
-|--------------	|
-| No parameters |
+### Parameters
+No parameters
 
 Example: 
 ```
