@@ -6,8 +6,6 @@
   * [/users/:id - GET](#usersid---get)
   * [/users/:id - PUT](#usersid---put)
   * [/users/:id - DELETE](#usersid---delete)
-
-
 - [Skill](#skill)
   * [/skills/:skill - GET](#skillsskill---get)
   * max freq skills
@@ -22,9 +20,13 @@ This is a API for Hack the North's Backend Challenge.
 
 1. Clone the repository
 2. In the root directory, install dependencies
-   > `npm install`
+```
+npm install
+```
 3. To start the server locally
-   > `npm start`
+```
+npm start
+```
 
 # User
 A User represents someone that is attending Hack the North
@@ -129,7 +131,7 @@ DELETE http://localhost:8000/users/2
 ```
 
 # Skill
-A skil is a technology or attribute that a user has, rated from 1 - 5.
+A skill is a technology or attribute that a user has, rated from 1 - 5.
 
 ### Attributes
 
@@ -167,7 +169,3 @@ GET http://localhost:8000/skills/?min_frequency=5&max_frequency=10
 ```
 
 # Tests
-
-# Next Steps
-
-
