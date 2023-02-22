@@ -59,9 +59,15 @@ The user's email
 
 The user's phone number
 
+`registered` - boolean
+
+The user's registration status for the event. True indicates that they have arrived and registed.
+
 `skills` - [Skill[ ]](#skill)
 
 The skills that this user has
+
+### Example User Object:
 
 ```
 {
@@ -70,6 +76,7 @@ The skills that this user has
     "company": "Jackson Ltd",
     "email": "lorettabrown@example.net",
     "phone": "+1-924-116-7963",
+    "registered": false,
     "skills": []
 }
 ```
@@ -368,4 +375,4 @@ I didn't get to writing any tests, but tested using Postman and also sanitized a
 - Sanitize inputs more, phone numbers should be either rejected for improper format or reformatted into a single standard. They vary a lot right now which could cause problems in the future for things like automated texting services. Also I probably missed one or two edge cases where invalid inputs get past my current checks.
 - Endpoints to:
   - Delete specific skills from users
-  - Show events, show and add more information (This can be quite endless)
+  - Show events, show and add more information. Registration can be more than a boolean, it should have registration date and time, which entrance they registered at, or the organizer that registered them if applicable.
