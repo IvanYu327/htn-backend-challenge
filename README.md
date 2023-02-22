@@ -7,6 +7,7 @@
   - [/users/:id - GET](#usersid---get)
   - [/users/:id - PUT](#usersid---put)
   <!-- * [/users/:id - DELETE](#usersid---delete) -->
+  - [/users/register/:id - PUT](#usersregisterid---put)
 - [Skill](#skill)
   - [/skills/:skill - GET](#skillsskill---get)
   - [/skills - GET](#skills---get)
