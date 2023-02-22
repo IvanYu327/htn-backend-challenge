@@ -268,6 +268,29 @@ No parameters
 DELETE http://localhost:8000/users/2
 ``` -->
 
+## /users/register/:id - PUT
+
+Finds a user by their user ID and sets their `registered` field to true, indicating their arrival and sign in to Hack the North.
+
+> Note that a user cannot be unregistered after registering
+
+### Example Request:
+
+```
+PUT http://localhost:8000/users/register/2
+```
+
+### Example Response:
+
+```
+{
+    "message": "success"
+}
+```
+
+
+
+
 # Skill
 
 A skill is a technology or attribute that a user has, rated from 1 - 5.
