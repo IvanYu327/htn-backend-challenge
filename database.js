@@ -31,7 +31,8 @@ db.serialize(() => {
       name text NOT NULL,
       company text, 
       email text NOT NULL,
-      phone text NOT NULL
+      phone text NOT NULL,
+      registered boolean NOT NULL DEFAULT 0
     )
   `,
     (err) => {
@@ -80,7 +81,7 @@ const populateTables = () => {
       db.run(userInsert, userValues, (err) => {
         if (err) {
           console.log("Rejecting: ", user);
-          console.log(err);
+          // console.log(err);
         }
       });
 
@@ -88,16 +89,14 @@ const populateTables = () => {
       db.get(`SELECT last_insert_rowid()`, (err, row) => {
         if (err) console.log(`Insert failed for ${user}. ${err}`);
         userId = row["last_insert_rowid()"];
-        // console.log(userId);
 
         db.parallelize(() => {
           user.skills.forEach((skill) => {
-            // console.log(skill);
             const skillValues = [userId, skill.skill, skill.rating];
             db.run(skillInsert, skillValues, (err) => {
               if (err) {
                 console.log("Rejecting: ", skill);
-                console.log(err);
+                console.log(err.message);
               }
             });
           });
