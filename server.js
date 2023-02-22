@@ -32,7 +32,7 @@ app.get("/users", (req, res, next) => {
 
   db.serialize(() => {
     const sql = `
-      SELECT name, company, email, phone
+      SELECT name, company, email, phone, registered
       FROM user
       ORDER BY id ASC
       LIMIT ? OFFSET ?`;
@@ -97,7 +97,7 @@ app.get("/users", (req, res, next) => {
 });
 
 //User Information Endpoint
-app.get("/user/:id", (req, res, next) => {
+app.get("/users/:id", (req, res, next) => {
   let userID = req.params.id || "";
   console.log(`GET - /user/${userID}"`);
 
@@ -105,14 +105,14 @@ app.get("/user/:id", (req, res, next) => {
   if (!userID || !validator.isInt(userID)) {
     res
       .status(400)
-      .json({ message: "User IDs is required and must be an integer." });
+      .json({ message: "User ID is required and must be an integer." });
     return;
   }
 
   userID = parseInt(userID);
 
   const userSql = `
-      SELECT name, company, email, phone
+      SELECT name, company, email, phone, registered
       FROM user
       WHERE id = ? `;
 
@@ -156,7 +156,7 @@ app.get("/user/:id", (req, res, next) => {
 });
 
 //Updating User Data Endpoint
-app.put("/user/:id", (req, res, next) => {
+app.put("/users/:id", (req, res, next) => {
   //Input Validation
   //TODO: Validate that no other key value pairs are there
   let userID = req.params.id;
@@ -309,6 +309,45 @@ app.put("/user/:id", (req, res, next) => {
 //     res.json({ message: "deleted", changes: this.changes });
 //   });
 // });
+
+//Registration Endpoint
+app.put("/users/register/:id", (req, res, next) => {
+  let userID = req.params.id || "";
+  console.log(`GET - /user/register/${userID}"`);
+
+  //Input Validation
+  if (!userID || !validator.isInt(userID)) {
+    res
+      .status(400)
+      .json({ message: "User ID is required and must be an integer." });
+    return;
+  }
+
+  userID = parseInt(userID);
+  
+  const sql = `
+    UPDATE user 
+    SET 
+    registered = 1,
+    WHERE id = ?`;
+  const params = [userID];
+  
+  db.run(sql, params, (err, result) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ message: "Something went wrong." });
+      return;
+    }
+    // If there are no skills to update, return a success message
+    if (!updatedSkills) {
+      res.status(200).json({
+        message: "success",
+      });
+      return;
+    }
+  }
+});
+
 
 //Skills Endpoints
 app.get("/skills/:skill", (req, res, next) => {
