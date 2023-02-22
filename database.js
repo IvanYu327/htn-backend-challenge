@@ -27,13 +27,11 @@ db.serialize(() => {
   db.run(
     `
     CREATE TABLE user (
-      user_id integer PRIMARY KEY AUTOINCREMENT,
+      id integer PRIMARY KEY AUTOINCREMENT,
       name text NOT NULL,
       company text, 
-      email text UNIQUE,
-      phone text UNIQUE, 
-      CONSTRAINT email_unique UNIQUE (email),
-      CONSTRAINT phone_unique UNIQUE (phone)
+      email text NOT NULL,
+      phone text NOT NULL
     )
   `,
     (err) => {
@@ -48,12 +46,12 @@ db.serialize(() => {
   db.run(
     `
     CREATE TABLE skill (
-      skill_id integer PRIMARY KEY AUTOINCREMENT,
+      id integer PRIMARY KEY AUTOINCREMENT,
       skill text NOT NULL,
       rating int NOT NULL, 
       user_id integer NOT NULL,
-      FOREIGN KEY (user_id)
-        REFERENCES user (user_id)
+      CONSTRAINT unique_user_skill UNIQUE (user_id, skill),
+      FOREIGN KEY (user_id) REFERENCES user (id)
     )
   `,
     (err) => {
@@ -68,20 +66,23 @@ db.serialize(() => {
 });
 
 const populateTables = () => {
-  let BUSER_DATA = USER_DATA.slice(0, 5);
-  console.log(`Populating the database with ${BUSER_DATA.length} objects`);
+  console.log(`Populating the database with ${USER_DATA.length} objects`);
 
   const userInsert =
-    "INSERT INTO user (name, company, email, phone) VALUES (?,?,?,?) RETURNING user_id";
+    "INSERT INTO user (name, company, email, phone) VALUES (?,?,?,?) RETURNING id";
 
   const skillInsert =
     "INSERT INTO skill (user_id, skill, rating) VALUES (?,?,?)";
-
-  BUSER_DATA.forEach((user) => {
-    db.serialize(() => {
+  db.serialize(() => {
+    USER_DATA.forEach((user) => {
       const userValues = [user.name, user.company, user.email, user.phone];
 
-      db.run(userInsert, userValues);
+      db.run(userInsert, userValues, (err) => {
+        if (err) {
+          console.log("Rejecting: ", user);
+          console.log(err);
+        }
+      });
 
       let userId;
       db.get(`SELECT last_insert_rowid()`, (err, row) => {
@@ -93,7 +94,12 @@ const populateTables = () => {
           user.skills.forEach((skill) => {
             // console.log(skill);
             const skillValues = [userId, skill.skill, skill.rating];
-            db.run(skillInsert, skillValues);
+            db.run(skillInsert, skillValues, (err) => {
+              if (err) {
+                console.log("Rejecting: ", skill);
+                console.log(err);
+              }
+            });
           });
         });
       });

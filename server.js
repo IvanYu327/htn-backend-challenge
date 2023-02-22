@@ -11,56 +11,117 @@ app.use(express.urlencoded({ extended: true }));
 
 //All Users Endpoint
 app.get("/users", (req, res, next) => {
+  console.log("GET - /users");
+  let offset = req.query.offset || "0";
+  let limit = req.query.limit || "250";
+
+  //Input Validation
+  if (!validator.isInt(offset)) {
+    res.status(400).json({ message: "Offsets must be integers" });
+    return;
+  }
+
+  if (!validator.isInt(limit)) {
+    res.status(400).json({ message: "Limits must be integers" });
+    return;
+  }
+
+  limit = parseInt(limit) < 250 ? parseInt(limit) : 250;
+  offset = parseInt(offset);
+  let out;
+
   db.serialize(() => {
     const sql = `
-      SELECT *
-      FROM user`;
+      SELECT name, company, email, phone
+      FROM user
+      ORDER BY id ASC
+      LIMIT ? OFFSET ?`;
 
-    // const sql = `
-    //   SELECT *
-    //   FROM user, skill
-    //   WHERE skill.user_id=user.user_id
-    // `;
-    db.all(sql, [], (err, rows) => {
+    db.all(sql, [limit, offset], (err, rows) => {
       if (err) {
-        res.status(400).json({ error: err.message });
+        console.log(err);
+        res.status(500).json({ message: "Something went wrong." });
         return;
       }
-      res.status(200).json({
-        message: "success",
-        data: rows,
+
+      if (!rows) {
+        res.status(200).json({ message: "No user found" });
+        return;
+      }
+      out = rows.map((row) => ({ ...row, skills: [] }));
+
+      const skillSql = `
+        SELECT skill, rating, user_id
+        FROM skill
+        WHERE user_id IN (
+          SELECT id
+          FROM user
+          ORDER BY id ASC
+          LIMIT ? OFFSET ?
+        )
+        ORDER BY user_id`;
+
+      db.all(skillSql, [limit, offset], (err, rows) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json({ message: "Something went wrong." });
+          return;
+        }
+
+        //Match skills to their user objects in order since we know both are sorted
+        offset = rows[0].user_id;
+
+        let userPointer = 0;
+        let skillNum = rows[0].user_id;
+        rows.forEach((row) => {
+          if (row.user_id !== skillNum) {
+            userPointer++;
+            skillNum = row.user_id;
+          }
+
+          out[userPointer].skills.push({
+            skill: row.skill,
+            rating: row.rating,
+          });
+        });
+
+        // Return data
+        res.status(200).json({
+          message: "success",
+          data: out,
+        });
+        return;
       });
-      // TODO: POPULATE WITH SKILLS
     });
   });
 });
 
 //User Information Endpoint
-app.get("/users/:userID", (req, res, next) => {
-  let userID = req.params.userID;
-  console.log(`GET - /users/${userID}"`);
+app.get("/user/:id", (req, res, next) => {
+  let userID = req.params.id || "";
+  console.log(`GET - /user/${userID}"`);
 
   //Input Validation
-  if (!validator.isInt(userID)) {
-    console.log("\tInvalid Input");
+  if (!userID || !validator.isInt(userID)) {
     res
       .status(400)
-      .json({ message: "Invalid user ID format, user IDs are integers" });
+      .json({ message: "User IDs is required and must be an integer." });
     return;
   }
 
   userID = parseInt(userID);
 
   const userSql = `
-      SELECT *
+      SELECT name, company, email, phone
       FROM user
-      WHERE user_id = ? `;
+      WHERE id = ? `;
 
   const params = [userID];
 
   db.get(userSql, params, (err, row) => {
     if (err) {
-      res.status(500).json({ error: err.message });
+      console.log(err);
+      res.status(500).json({ message: "Something went wrong." });
       return;
     }
 
@@ -78,7 +139,8 @@ app.get("/users/:userID", (req, res, next) => {
 
     db.all(skillSql, params, (err, rows) => {
       if (err) {
-        res.status(500).json({ error: err.message });
+        console.log(err);
+        res.status(500).json({ message: "Something went wrong." });
         return;
       }
 
@@ -94,40 +156,60 @@ app.get("/users/:userID", (req, res, next) => {
 });
 
 //Updating User Data Endpoint
-app.put("/users/:userID", (req, res, next) => {
+app.put("/user/:id", (req, res, next) => {
   //Input Validation
   //TODO: Validate that no other key value pairs are there
-  updatedName = req.body.name;
-  updatedCompany = req.body.company;
-  updatedEmail = req.body.email;
-  updatedPhone = req.body.phone;
-  updatedSkills = req.body.skills;
+  let userID = req.params.id;
+  let updatedName = req.body.name;
+  let updatedCompany = req.body.company;
+  let updatedEmail = req.body.email;
+  let updatedPhone = req.body.phone;
+  let updatedSkills = req.body.skills;
 
-  if (!_.isString(updatedName)) {
+  //Input Validation
+  if (!userID || !validator.isInt(userID)) {
+    res
+      .status(400)
+      .json({ message: "User IDs is required and must be an integer." });
+    return;
+  }
+  userID = parseInt(req.params.id);
+
+  if (updatedName && !_.isString(updatedName)) {
     res.status(400).json({ message: "Names must be a string." });
     return;
   }
 
-  if (!_.isString(updatedCompany)) {
+  if (updatedCompany && !_.isString(updatedCompany)) {
     res.status(400).json({ message: "Company must be a string." });
     return;
   }
 
-  if (!validator.isEmail(email)) {
+  if (updatedEmail && !validator.isEmail(email)) {
     res.status(400).json({ message: "Invalid email." });
     return;
   }
 
-  //TODO: CAN WE VALIDATE THIS MORE?
-  if (!_.isString(updatedPhone)) {
+  if (updatedPhone && !_.isString(updatedPhone)) {
     res.status(400).json({ message: "Phone number must be a string." });
     return;
   }
 
-  //TODO: VALIDATE SKILLS
+  if (updatedSkills)
+    updatedSkills.forEach((skill) => {
+      if (
+        !skill.skill ||
+        !skill.rating ||
+        !_.isString(skill.skill) ||
+        !validator.isInt(skill.rating + "") ||
+        skill.rating > 5 ||
+        skill.rating < 1
+      ) {
+        res.status(400).json({ message: "Improper skill object as input." });
+        return;
+      }
+    });
   //TODO: UPDATE SKILLS
-
-  const userID = parseInt(req.params.userID);
 
   const sql = `
     UPDATE user 
@@ -136,7 +218,7 @@ app.put("/users/:userID", (req, res, next) => {
     company = COALESCE(?,company),
     email = COALESCE(?,email), 
     phone = COALESCE(?,phone) 
-    WHERE user_id = ?`;
+    WHERE id = ?`;
 
   const params = [
     updatedName,
@@ -148,40 +230,85 @@ app.put("/users/:userID", (req, res, next) => {
 
   db.run(sql, params, (err, result) => {
     if (err) {
-      res.status(400).json({ error: res.message });
+      console.log(err);
+      res.status(500).json({ message: "Something went wrong." });
       return;
     }
-    res.status(200).json({
-      message: "success",
-      result: result,
-    });
+    // If there are no skills to update, return a success message
+    if (!updatedSkills) {
+      res.status(200).json({
+        message: "success",
+      });
+      return;
+    }
+
+    const updateSkillsSql = `
+      INSERT INTO skill (skill, rating, user_id)
+      VALUES (?, ?, ?)
+      ON CONFLICT (user_id, skill)
+      DO UPDATE SET rating = excluded.rating;
+    `;
+
+    let error;
+    for (let i = 0; i < updatedSkills.length; i++) {
+      let skill = updatedSkills[i];
+      const params = [skill.skill, skill.rating, userID];
+
+      db.run(updateSkillsSql, params, (err, result) => {
+        if (err) {
+          error = err;
+          console.log(err);
+        }
+
+        //At the last skill, return
+        if (i === updatedSkills.length - 1) {
+          if (error) {
+            res.status(500).json({ message: "Something went wrong." });
+            return;
+          }
+
+          res.status(200).json({
+            message: "success",
+            result: result,
+          });
+          return;
+        }
+      });
+    }
   });
 });
 
-//Delete user endpoint
-app.delete("/user/:id", (req, res, next) => {
-  let userID = req.params.userID;
-  console.log(`DELETE - /users/"${userID}"`);
+// //Delete user endpoint
+// app.delete("/user/:id", (req, res, next) => {
+//   let userID = req.params.id || "";
+//   console.log(`DELETE - /users/"${userID}"`);
 
-  //Input Validation
-  if (!validator.isInt(userID)) {
-    console.log("\tInvalid Input");
-    res
-      .status(400)
-      .json({ message: "Invalid user ID format, user IDs are integers" });
-    return;
-  }
+//   //Input Validation
+//   if (!validator.isInt(userID)) {
+//     console.log("\tInvalid Input");
+//     res
+//       .status(400)
+//       .json({ message: "Invalid user ID format, user IDs are integers" });
+//     return;
+//   }
 
-  userID = parseInt(userID);
+//   userID = parseInt(userID);
 
-  db.run("DELETE FROM user WHERE id = ?", userID, function (err, result) {
-    if (err) {
-      res.status(400).json({ error: res.message });
-      return;
-    }
-    res.json({ message: "deleted", changes: this.changes });
-  });
-});
+//   const sql = `DELETE user, skill
+//     FROM user
+//     INNER JOIN skill
+//     ON user.id = skill.user_id
+//     WHERE id = ?`;
+
+//   db.run(sql, userID, function (err, result) {
+//     if (err) {
+//       console.log(err);
+//       res.status(500).json({ message: "Something went wrong." });
+//       return;
+//     }
+//     res.json({ message: "deleted", changes: this.changes });
+//   });
+// });
 
 //Skills Endpoints
 app.get("/skills/:skill", (req, res, next) => {
@@ -195,35 +322,78 @@ app.get("/skills/:skill", (req, res, next) => {
 
   skillQuery = skillQuery.toLowerCase();
 
-  //TO DO VALIDATE INPUTS
+  const sql = `
+    SELECT COUNT(*)
+    FROM skill
+    WHERE LOWER(skill) = ?`;
 
-  db.serialize(() => {
-    const sql = `
-      SELECT COUNT(*)
-      FROM skill
-      WHERE LOWER(skill) = ?`;
-
-    db.get(sql, [skillQuery], (err, count) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.status(200).json({
-        message: "success",
-        count: count["COUNT(*)"],
-      });
-      // TODO: POPULATE WITH SKILLS
+  db.get(sql, [skillQuery], (err, count) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ message: "Something went wrong." });
+      return;
+    }
+    res.status(200).json({
+      message: "success",
+      count: count["COUNT(*)"],
     });
   });
 });
 
-// Query parameter filtering - minimum/maximum frequency
+//Skill Frequency Range Endpoint
+app.get("/skills/", (req, res, next) => {
+  let min = req.query.min_frequency;
+  let max = req.query.max_frequency;
+  console.log(`GET - /skills/${(min, max)}"`);
 
-// Insert here other API endpoints
+  if (min && !validator.isInt(min)) {
+    res.status(400).json({ message: "Min frequency must be an integer." });
+    return;
+  }
+  if (min) min = parseInt(min);
+
+  if (max && !validator.isInt(max)) {
+    res.status(400).json({ message: "Max frequency must be an integer." });
+    return;
+  }
+  if (max) max = parseInt(max);
+
+  if (min > max || min < 0 || max < 0) {
+    res.status(400).json({
+      message: "The minimum cannot be smaller than the maximum frequency",
+    });
+    return;
+  }
+
+  const sql = `
+      SELECT skill
+      FROM (
+        SELECT skill, COUNT(*) AS frequency
+        FROM skill
+        GROUP BY skill
+      )
+      WHERE (frequency >= ? OR ? IS NULL)
+        AND (frequency <= ? OR ? IS NULL)`;
+
+  db.all(sql, [min, min, max, max], (err, skills) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ message: "Something went wrong." });
+      return;
+    }
+
+    skills = skills.map((skill) => skill.skill);
+
+    res.status(200).json({
+      message: "success",
+      data: skills,
+    });
+  });
+});
 
 // Root endpoint
 app.use("/", (req, res, next) => {
-  res.status(200).json({ message: "Ok" });
+  res.status(200).json({ message: "pong" });
 });
 
 // Start server
