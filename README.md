@@ -361,9 +361,9 @@ For skills, they are constrained that every pair of `user_id` and `skill` can on
 
 ## Duplicate emails and skills
 
-Haha, very sneaky. In my initial database design, emails had to be unique and users could only possess one skill once. I ended up getting a bunch of errors because there were duplicate emails and duplicate skills within a single user. For the sake of this challenge, I allowed duplicate emails, but for skills, I only took the first skill, rejecting future duplicates on the intial database setup.
+Haha, very sneaky. In my initial database design, emails had to be unique and users could only possess one skill once. I ended up getting a bunch of errors because there were duplicate emails and duplicate skills within a single user. For the sake of this challenge, I allowed duplicate emails, but for skills, I only took the first skill, rejecting future duplicates on the initial database setup.
 
-Otherwise, in the `CREATE TABLE user` statement, I would have added a `CONSTRAINT email_unique UNIQUE (email)` to the end of the SQL statement to make emails unique across users. Same for phone numbers but one could argue of a case that two child hackers could use the same guardian phone number since phone numbers aren't used for login like emails are.
+Otherwise, in the `CREATE TABLE user` statement, I would have added a `CONSTRAINT email_unique UNIQUE (email)` to the end of the SQL statement to make emails unique across users. Same for phone numbers, but one could argue of a case that two child hackers could use the same guardian phone number since phone numbers aren't used for login like emails are.
 
 ## Tests
 
@@ -374,5 +374,6 @@ I didn't get to writing any tests, but tested using Postman and also sanitized a
 - Write some tests
 - Sanitize inputs more, phone numbers should be either rejected for improper format or reformatted into a single standard. They vary a lot right now which could cause problems in the future for things like automated texting services. Also I probably missed one or two edge cases where invalid inputs get past my current checks.
 - Endpoints to:
+  - Create new users
   - Delete specific skills from users
   - Show events, show and add more information. Registration can be more than a boolean, it should have registration date and time, which entrance they registered at, or the organizer that registered them if applicable.
