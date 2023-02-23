@@ -1,4 +1,4 @@
-# HTN - Backend Challenge - Ivan Yu
+# HTN - Backend Challenge
 
 - [About](#about)
 - [Getting Started](#getting-started)
