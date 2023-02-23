@@ -32,7 +32,7 @@ app.get("/users", (req, res, next) => {
 
   db.serialize(() => {
     const sql = `
-      SELECT name, company, email, phone, registered
+      SELECT name, company, email, phone, is_registered
       FROM user
       ORDER BY id ASC
       LIMIT ? OFFSET ?`;
@@ -112,7 +112,7 @@ app.get("/users/:id", (req, res, next) => {
   userID = parseInt(userID);
 
   const userSql = `
-      SELECT name, company, email, phone, registered
+      SELECT name, company, email, phone, is_registered
       FROM user
       WHERE id = ? `;
 
@@ -278,7 +278,8 @@ app.put("/users/:id", (req, res, next) => {
   });
 });
 
-// //Delete user endpoint
+// //Delete user endpoint, unfinished with a bug somewhere.
+//
 // app.delete("/user/:id", (req, res, next) => {
 //   let userID = req.params.id || "";
 //   console.log(`DELETE - /users/"${userID}"`);
@@ -313,7 +314,7 @@ app.put("/users/:id", (req, res, next) => {
 //Registration Endpoint
 app.put("/users/register/:id", (req, res, next) => {
   let userID = req.params.id || "";
-  console.log(`GET - /user/register/${userID}"`);
+  console.log(`PUT - /user/register/${userID}"`);
 
   //Input Validation
   if (!userID || !validator.isInt(userID)) {
@@ -324,30 +325,27 @@ app.put("/users/register/:id", (req, res, next) => {
   }
 
   userID = parseInt(userID);
-  
+
   const sql = `
     UPDATE user 
     SET 
-    registered = 1,
+    is_registered = 1
     WHERE id = ?`;
   const params = [userID];
-  
+
   db.run(sql, params, (err, result) => {
     if (err) {
       console.log(err);
       res.status(500).json({ message: "Something went wrong." });
       return;
     }
-    // If there are no skills to update, return a success message
-    if (!updatedSkills) {
-      res.status(200).json({
-        message: "success",
-      });
-      return;
-    }
-  }
-});
 
+    res.status(200).json({
+      message: "success",
+    });
+    return;
+  });
+});
 
 //Skills Endpoints
 app.get("/skills/:skill", (req, res, next) => {
@@ -437,5 +435,7 @@ app.use("/", (req, res, next) => {
 
 // Start server
 app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}/`)
+  console.log(`Server running on http://localhost:${PORT}`)
 );
+
+export const server = app;

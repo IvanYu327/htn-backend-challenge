@@ -11,6 +11,7 @@
 - [Skill](#skill)
   - [/skills/:skill - GET](#skillsskill---get)
   - [/skills - GET](#skills---get)
+- [Tests](#tests)
 - [Findings and Next Steps](#findings-and-next-steps)
 
 # About
@@ -60,7 +61,7 @@ The user's email
 
 The user's phone number
 
-`registered` - boolean
+`is_registered` - integer - 0 or 1
 
 The user's registration status for the event. True indicates that they have arrived and registed.
 
@@ -77,7 +78,7 @@ The skills that this user has
     "company": "Jackson Ltd",
     "email": "lorettabrown@example.net",
     "phone": "+1-924-116-7963",
-    "registered": false,
+    "is_registered": 0,
     "skills": []
 }
 ```
@@ -115,6 +116,7 @@ http://localhost:8000/users/?limit=2&offset=1
             "company": "Moon, Mendoza and Carter",
             "email": "frederickkyle@example.org",
             "phone": "(186)579-0542",
+            "is_registered": 0,
             "skills": [
                 {
                     "skill": "Foundation",
@@ -139,6 +141,7 @@ http://localhost:8000/users/?limit=2&offset=1
             "company": "Johnson-Christian",
             "email": "bowmancynthia@example.net",
             "phone": "912.284.0199",
+            "is_registered": 1,
             "skills": [
                 {
                     "skill": "PHP",
@@ -182,6 +185,7 @@ GET http://localhost:8000/users/2
         "company": "Jackson Ltd",
         "email": "lorettabrown@example.net",
         "phone": "+1-924-116-7963",
+        "is_registered": 0,
         "skills": [
             {
                 "skill": "Swift",
@@ -289,9 +293,6 @@ PUT http://localhost:8000/users/register/2
 }
 ```
 
-
-
-
 # Skill
 
 A skill is a technology or attribute that a user has, rated from 1 - 5.
@@ -375,6 +376,18 @@ GET http://localhost:8000/skills/?min_frequency=2&max_frequency=5
 }
 ```
 
+# Testing
+
+Tests are written with Jest and Supertest, and test the `GET` endpoints, validating both proper and improper inputs. To test the Express server, run
+
+```
+npm test
+```
+
+Expected output:
+
+![alt text](https://media.discordapp.net/attachments/849853036155371650/1078168787150446673/image.png)
+
 # Findings and Next Steps
 
 ## Table design
@@ -383,21 +396,26 @@ I created two tables, `user` and `skill`. It made sense to split the data into t
 
 For skills, they are constrained that every pair of `user_id` and `skill` can only appear once, no user can have two of the same skill.
 
+`is_registered` was set as an integer even though its meant to be a boolean bc sqlite doesn't have a native boolean type.
+
 ## Duplicate emails and skills
 
-Haha, very sneaky. In my initial database design, emails had to be unique and users could only possess one skill once. I ended up getting a bunch of errors because there were duplicate emails and duplicate skills within a single user. For the sake of this challenge, I allowed duplicate emails, but for skills, I only took the first skill, rejecting future duplicates on the initial database setup.
+Haha, very sneaky! In my initial database design, emails had to be unique and users could only possess one skill once. I ended up getting a bunch of errors because there were duplicate emails and duplicate skills within a single user. For the sake of this challenge, I allowed duplicate emails, but for skills, I only took the first skill, rejecting future duplicates on the initial database setup.
 
-Otherwise, in the `CREATE TABLE user` statement, I would have added a `CONSTRAINT email_unique UNIQUE (email)` to the end of the SQL statement to make emails unique across users. Same for phone numbers, but one could argue of a case that two child hackers could use the same guardian phone number since phone numbers aren't used for login like emails are.
-
-## Tests
-
-I didn't get to writing any tests, but tested using Postman and also sanitized and validated all inputs, checking for types, range constraints, and using validator libraries.
+Otherwise, in the `CREATE TABLE user` statement, I would have added `CONSTRAINT email_unique UNIQUE (email)` to the end of the SQL statement to make emails unique across users. Same for phone numbers, but one could argue of a case that two child hackers could use the same guardian phone number since phone numbers aren't used for login like emails are.
 
 ## Next Steps
 
-- Write some tests
-- Sanitize inputs more, phone numbers should be either rejected for improper format or reformatted into a single standard. They vary a lot right now which could cause problems in the future for things like automated texting services. Also I probably missed one or two edge cases where invalid inputs get past my current checks.
-- Endpoints to:
-  - Create new users
-  - Delete specific skills from users
-  - Show events, show and add more information. Registration can be more than a boolean, it should have registration date and time, which entrance they registered at, or the organizer that registered them if applicable.
+### More Endpoints
+
+I'd look to create endpoints to create new users, delete users or just specific skills from users.
+
+Also adding more querying parameters to the `/user` endpoint such as filtering by `name` or `is_registered`. This would be useful for admin boards to paginate through sorted lists of hackers.
+
+### More Tests
+
+With the above endpoints, test cases could go through all of CRUD without relying on the data that may or may not be present in the database, making for more consistent test cases.
+
+### Input Validation
+
+I'd like to sanitize and validate inputs more. Phone numbers should be either rejected for improper format or reformatted into a single standard. They vary a lot right now which could cause problems in the future for things like automated texting services. Also I probably missed one or two edge cases where invalid inputs get past my current checks.

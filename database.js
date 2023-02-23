@@ -32,7 +32,7 @@ db.serialize(() => {
       company text, 
       email text NOT NULL,
       phone text NOT NULL,
-      registered boolean NOT NULL DEFAULT 0
+      is_registered integer DEFAULT 0 CHECK (is_registered IN (0, 1))
     )
   `,
     (err) => {
@@ -49,7 +49,7 @@ db.serialize(() => {
     CREATE TABLE skill (
       id integer PRIMARY KEY AUTOINCREMENT,
       skill text NOT NULL,
-      rating int NOT NULL, 
+      rating integer NOT NULL, 
       user_id integer NOT NULL,
       CONSTRAINT unique_user_skill UNIQUE (user_id, skill),
       FOREIGN KEY (user_id) REFERENCES user (id)
@@ -67,7 +67,7 @@ db.serialize(() => {
 });
 
 const populateTables = () => {
-  console.log(`Populating the database with ${USER_DATA.length} objects`);
+  console.log(`Populating the database with ${USER_DATA.length} objects ...`);
 
   const userInsert =
     "INSERT INTO user (name, company, email, phone) VALUES (?,?,?,?) RETURNING id";
@@ -81,7 +81,7 @@ const populateTables = () => {
       db.run(userInsert, userValues, (err) => {
         if (err) {
           console.log("Rejecting: ", user);
-          // console.log(err);
+          console.log(err);
         }
       });
 
