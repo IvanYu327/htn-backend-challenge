@@ -18,6 +18,12 @@
 
 This is a API for Hack the North's Backend Challenge.
 
+## Notable Files
+
+- `database.js` - Database initialization
+- `server.js` - Express server and endpoints
+- `server.test.js` - Test cases
+
 # Getting Started
 
 1. Clone the repository
@@ -33,7 +39,7 @@ npm install
 npm start
 ```
 
-4. The server will run locally from `http://localhost:8000`
+4. The server will run locally from `http://localhost:8000` and a `db.sqlite` file should be generated
 
 # User
 
