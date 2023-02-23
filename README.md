@@ -71,7 +71,7 @@ The user's phone number
 
 The user's registration status for the event. True indicates that they have arrived and registed.
 
-`skills` - [Skill[ ]](#skill)
+`skills` - [Skill](#skill)[ ]
 
 The skills that this user has
 
