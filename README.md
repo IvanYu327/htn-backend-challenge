@@ -363,7 +363,7 @@ The maximum frequency. Must be greater than 0.
 ### Example Request:
 
 ```
-GET http://localhost:8000/skills/?min_frequency=2&max_frequency=5
+GET http://localhost:8000/skills/?min_frequency=40&max_frequency=45
 ```
 
 ### Example Response:
@@ -372,12 +372,14 @@ GET http://localhost:8000/skills/?min_frequency=2&max_frequency=5
 {
     "message": "success",
     "data": [
-        "Elixir",
-        "Fortran",
-        "Sed",
-        "Smalltalk",
-        "Spectre.css",
-        "Swift"
+        {
+            "skill": "React",
+            "frequency": 41
+        },
+        {
+            "skill": "Sanic",
+            "frequency": 43
+        }
     ]
 }
 ```

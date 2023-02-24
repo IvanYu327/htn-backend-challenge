@@ -62,19 +62,19 @@ describe("User Endpoints", () => {
 });
 
 describe("Skills Endpoints", () => {
-  it("GET /skills/:skill should show a count of the skill's occurence", async () => {
+  it("GET /skills/:skill should show a frequency of the skill's occurence", async () => {
     const res = await request.get("/skills/php");
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty("message");
-    expect(res.body).toHaveProperty("count");
+    expect(res.body).toHaveProperty("frequency");
   });
 
   it("GET /skills/ThisIsProbablyNotASkill should show 0 occurences", async () => {
     const res = await request.get("/skills/ThisIsProbablyNotASkill");
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty("message");
-    expect(res.body).toHaveProperty("count");
-    expect(res.body.count).toEqual(0);
+    expect(res.body).toHaveProperty("frequency");
+    expect(res.body.frequency).toEqual(0);
   });
 
   it("GET /skills/?min_frequency=2&max_frequency=5 should return an array of skills", async () => {
@@ -84,7 +84,8 @@ describe("Skills Endpoints", () => {
     expect(res.type).toEqual(expect.stringContaining("json"));
     expect(res.body).toHaveProperty("message");
     res.body.data.forEach((skill) => {
-      expect(typeof skill).toEqual("string");
+      expect(skill).toHaveProperty("skill");
+      expect(skill).toHaveProperty("frequency");
     });
   });
 

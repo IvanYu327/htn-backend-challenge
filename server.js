@@ -364,7 +364,7 @@ app.get("/skills/:skill", (req, res, next) => {
     FROM skill
     WHERE LOWER(skill) = ?`;
 
-  db.get(sql, [skillQuery], (err, count) => {
+  db.get(sql, [skillQuery], (err, frequency) => {
     if (err) {
       console.log(err);
       res.status(500).json({ message: "Something went wrong." });
@@ -372,7 +372,7 @@ app.get("/skills/:skill", (req, res, next) => {
     }
     res.status(200).json({
       message: "success",
-      count: count["COUNT(*)"],
+      frequency: frequency["COUNT(*)"],
     });
   });
 });
@@ -381,7 +381,7 @@ app.get("/skills/:skill", (req, res, next) => {
 app.get("/skills/", (req, res, next) => {
   let min = req.query.min_frequency;
   let max = req.query.max_frequency;
-  console.log(`GET - /skills/${(min, max)}"`);
+  console.log(`GET - /skills/min=${min}/max=${max}"`);
 
   if (min && !validator.isInt(min)) {
     res.status(400).json({ message: "Min frequency must be an integer." });
@@ -403,7 +403,7 @@ app.get("/skills/", (req, res, next) => {
   }
 
   const sql = `
-      SELECT skill
+      SELECT skill, frequency 
       FROM (
         SELECT skill, COUNT(*) AS frequency
         FROM skill
@@ -418,8 +418,6 @@ app.get("/skills/", (req, res, next) => {
       res.status(500).json({ message: "Something went wrong." });
       return;
     }
-
-    skills = skills.map((skill) => skill.skill);
 
     res.status(200).json({
       message: "success",
